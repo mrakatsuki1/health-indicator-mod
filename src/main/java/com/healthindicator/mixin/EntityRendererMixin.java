@@ -17,16 +17,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EntityRenderer.class)
+@Mixin(value = EntityRenderer.class, priority = 900)
 public abstract class EntityRendererMixin<T extends Entity> {
 
     @Unique
     private Entity healthIndicator$currentEntity = null;
 
-    @Inject(
-        method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
-        at = @At("HEAD")
-    )
+    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), remap = false)
     private void healthIndicator$captureEntity(T entity,
                                                 Text text,
                                                 MatrixStack matrices,
@@ -38,10 +35,12 @@ public abstract class EntityRendererMixin<T extends Entity> {
     }
 
     @Redirect(
-        method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
+        method = "renderLabelIfPresent",
+        remap = false,
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I"
+            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I",
+            remap = false
         )
     )
     private int healthIndicator$colorizeNametag(TextRenderer textRenderer,
@@ -55,40 +54,28 @@ public abstract class EntityRendererMixin<T extends Entity> {
                                                  TextRenderer.TextLayerType layerType,
                                                  int backgroundColor,
                                                  int light) {
-
         Entity entity = this.healthIndicator$currentEntity;
-
         if (entity instanceof LivingEntity living) {
             float maxHealth = living.getMaxHealth();
             float currentHealth = living.getHealth();
             float percent = (maxHealth > 0f) ? (currentHealth / maxHealth) * 100f : 100f;
 
             int healthColor;
-            if (percent > 75f) {
-                healthColor = 0x55FF55;
-            } else if (percent > 50f) {
-                healthColor = 0xFFFF55;
-            } else if (percent > 25f) {
-                healthColor = 0xFFAA00;
-            } else {
-                healthColor = 0xFF5555;
-            }
+            if (percent > 75f) healthColor = 0x55FF55;
+            else if (percent > 50f) healthColor = 0xFFFF55;
+            else if (percent > 25f) healthColor = 0xFFAA00;
+            else healthColor = 0xFF5555;
 
             MutableText coloredText = Text.literal(text.getString())
                     .setStyle(Style.EMPTY.withColor(healthColor));
-
             return textRenderer.draw(coloredText, x, y, healthColor, shadow,
                     matrix, vertexConsumers, layerType, backgroundColor, light);
         }
-
         return textRenderer.draw(text, x, y, color, shadow, matrix,
                 vertexConsumers, layerType, backgroundColor, light);
     }
 
-    @Inject(
-        method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
-        at = @At("RETURN")
-    )
+    @Inject(method = "renderLabelIfPresent", at = @At("RETURN"), remap = false)
     private void healthIndicator$clearEntity(T entity,
                                               Text text,
                                               MatrixStack matrices,
