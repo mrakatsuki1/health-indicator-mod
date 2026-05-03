@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = EntityRenderer.class, priority = 900)
+@Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin<T extends Entity> {
 
     @Unique
     private Entity healthIndicator$currentEntity = null;
 
-    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), remap = false)
+    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"))
     private void healthIndicator$captureEntity(T entity,
                                                 Text text,
                                                 MatrixStack matrices,
@@ -36,11 +36,9 @@ public abstract class EntityRendererMixin<T extends Entity> {
 
     @Redirect(
         method = "renderLabelIfPresent",
-        remap = false,
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I",
-            remap = false
+            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I"
         )
     )
     private int healthIndicator$colorizeNametag(TextRenderer textRenderer,
@@ -75,7 +73,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
                 vertexConsumers, layerType, backgroundColor, light);
     }
 
-    @Inject(method = "renderLabelIfPresent", at = @At("RETURN"), remap = false)
+    @Inject(method = "renderLabelIfPresent", at = @At("RETURN"))
     private void healthIndicator$clearEntity(T entity,
                                               Text text,
                                               MatrixStack matrices,
