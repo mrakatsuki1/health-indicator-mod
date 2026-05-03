@@ -29,7 +29,6 @@ public abstract class EntityRendererMixin<T extends Entity> {
                                                 MatrixStack matrices,
                                                 VertexConsumerProvider vertexConsumers,
                                                 int light,
-                                                float tickDelta,
                                                 CallbackInfo ci) {
         this.healthIndicator$currentEntity = entity;
     }
@@ -79,7 +78,6 @@ public abstract class EntityRendererMixin<T extends Entity> {
                                               MatrixStack matrices,
                                               VertexConsumerProvider vertexConsumers,
                                               int light,
-                                              float tickDelta,
                                               CallbackInfo ci) {
         this.healthIndicator$currentEntity = null;
     }
