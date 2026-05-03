@@ -23,8 +23,12 @@ public abstract class EntityRendererMixin<T extends Entity> {
     @Unique
     private Entity healthIndicator$currentEntity = null;
 
-    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"))
-    private void healthIndicator$captureEntity(T entity,
+    @Inject(
+        method = "method_3926",
+        at = @At("HEAD"),
+        remap = false
+    )
+    private void healthIndicator$captureEntity(Entity entity,
                                                 Text text,
                                                 MatrixStack matrices,
                                                 VertexConsumerProvider vertexConsumers,
@@ -34,10 +38,12 @@ public abstract class EntityRendererMixin<T extends Entity> {
     }
 
     @Redirect(
-        method = "renderLabelIfPresent",
+        method = "method_3926",
+        remap = false,
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I"
+            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I",
+            remap = false
         )
     )
     private int healthIndicator$colorizeNametag(TextRenderer textRenderer,
@@ -72,8 +78,12 @@ public abstract class EntityRendererMixin<T extends Entity> {
                 vertexConsumers, layerType, backgroundColor, light);
     }
 
-    @Inject(method = "renderLabelIfPresent", at = @At("RETURN"))
-    private void healthIndicator$clearEntity(T entity,
+    @Inject(
+        method = "method_3926",
+        at = @At("RETURN"),
+        remap = false
+    )
+    private void healthIndicator$clearEntity(Entity entity,
                                               Text text,
                                               MatrixStack matrices,
                                               VertexConsumerProvider vertexConsumers,
