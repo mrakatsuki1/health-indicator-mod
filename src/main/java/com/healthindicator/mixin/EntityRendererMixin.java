@@ -23,7 +23,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
     @Unique
     private Entity healthIndicator$currentEntity = null;
 
-    @Inject(method = "renderNameTag", at = @At("HEAD"))
+    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"))
     private void healthIndicator$captureEntity(T entity,
                                                 Text text,
                                                 MatrixStack matrices,
@@ -35,7 +35,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
     }
 
     @Redirect(
-        method = "renderNameTag",
+        method = "renderLabelIfPresent",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/font/TextRenderer;draw(" +
@@ -65,7 +65,6 @@ public abstract class EntityRendererMixin<T extends Entity> {
         if (entity instanceof LivingEntity living) {
             float maxHealth = living.getMaxHealth();
             float currentHealth = living.getHealth();
-
             float percent = (maxHealth > 0f) ? (currentHealth / maxHealth) * 100f : 100f;
 
             int healthColor;
@@ -82,23 +81,15 @@ public abstract class EntityRendererMixin<T extends Entity> {
             MutableText coloredText = Text.literal(text.getString())
                     .setStyle(Style.EMPTY.withColor(healthColor));
 
-            return textRenderer.draw(
-                    coloredText,
-                    x, y,
-                    healthColor,
-                    shadow,
-                    matrix,
-                    vertexConsumers,
-                    layerType,
-                    backgroundColor,
-                    light
-            );
+            return textRenderer.draw(coloredText, x, y, healthColor, shadow,
+                    matrix, vertexConsumers, layerType, backgroundColor, light);
         }
 
-        return textRenderer.draw(text, x, y, color, shadow, matrix, vertexConsumers, layerType, backgroundColor, light);
+        return textRenderer.draw(text, x, y, color, shadow, matrix,
+                vertexConsumers, layerType, backgroundColor, light);
     }
 
-    @Inject(method = "renderNameTag", at = @At("RETURN"))
+    @Inject(method = "renderLabelIfPresent", at = @At("RETURN"))
     private void healthIndicator$clearEntity(T entity,
                                               Text text,
                                               MatrixStack matrices,
