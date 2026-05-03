@@ -1,0 +1,38 @@
+name: Build Mod JAR
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Code checkout
+      uses: actions/checkout@v4
+
+    - name: Java 21 setup
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Gradle cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+
+    - name: Mod build karo
+      run: ./gradlew build --no-daemon
+
+    - name: JAR upload karo
+      uses: actions/upload-artifact@v4
+      with:
+        name: health-indicator-mod
+        path: build/libs/health-indicator-*.jar
+        if-no-files-found: error
