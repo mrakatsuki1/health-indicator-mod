@@ -23,7 +23,10 @@ public abstract class EntityRendererMixin<T extends Entity> {
     @Unique
     private Entity healthIndicator$currentEntity = null;
 
-    @Inject(method = "renderLabelIfPresent", at = @At("HEAD"))
+    @Inject(
+        method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
+        at = @At("HEAD")
+    )
     private void healthIndicator$captureEntity(T entity,
                                                 Text text,
                                                 MatrixStack matrices,
@@ -35,17 +38,10 @@ public abstract class EntityRendererMixin<T extends Entity> {
     }
 
     @Redirect(
-        method = "renderLabelIfPresent",
+        method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/font/TextRenderer;draw(" +
-                     "Lnet/minecraft/text/Text;" +
-                     "FF" +
-                     "IZ" +
-                     "Lorg/joml/Matrix4f;" +
-                     "Lnet/minecraft/client/render/VertexConsumerProvider;" +
-                     "Lnet/minecraft/client/font/TextRenderer$TextLayerType;" +
-                     "II)I"
+            target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I"
         )
     )
     private int healthIndicator$colorizeNametag(TextRenderer textRenderer,
@@ -69,13 +65,13 @@ public abstract class EntityRendererMixin<T extends Entity> {
 
             int healthColor;
             if (percent > 75f) {
-                healthColor = 0x55FF55; // Green
+                healthColor = 0x55FF55;
             } else if (percent > 50f) {
-                healthColor = 0xFFFF55; // Yellow
+                healthColor = 0xFFFF55;
             } else if (percent > 25f) {
-                healthColor = 0xFFAA00; // Orange
+                healthColor = 0xFFAA00;
             } else {
-                healthColor = 0xFF5555; // Red
+                healthColor = 0xFF5555;
             }
 
             MutableText coloredText = Text.literal(text.getString())
@@ -89,7 +85,10 @@ public abstract class EntityRendererMixin<T extends Entity> {
                 vertexConsumers, layerType, backgroundColor, light);
     }
 
-    @Inject(method = "renderLabelIfPresent", at = @At("RETURN"))
+    @Inject(
+        method = "renderLabelIfPresent(Lnet/minecraft/entity/Entity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
+        at = @At("RETURN")
+    )
     private void healthIndicator$clearEntity(T entity,
                                               Text text,
                                               MatrixStack matrices,
