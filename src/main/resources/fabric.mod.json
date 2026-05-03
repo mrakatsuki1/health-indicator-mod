@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "health_indicator",
+  "version": "${version}",
+
+  "name": "Health Indicator",
+  "description": "Enemy ki health ke hisab se nametag ka color change karta hai. Green (75%+), Yellow (50-74%), Orange (25-49%), Red (0-24%).",
+  "authors": ["Player"],
+
+  "environment": "client",
+
+  "entrypoints": {
+    "client": [
+      "com.healthindicator.HealthIndicatorMod"
+    ]
+  },
+
+  "mixins": [
+    "healthindicator.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
